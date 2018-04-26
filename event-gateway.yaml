@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: event-gateway
+spec:
+  type: LoadBalancer
+  ports:
+    - name: events
+      port: 4000
+    - name: config
+      port: 4001
+  selector:
+    app: event-gateway
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: event-gateway
+  labels:
+    app: event-gateway
+spec:
+  serviceName: "event-gateway"
+  selector:
+    matchLabels:
+      app: event-gateway
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: event-gateway
+    spec:
+      containers:
+        - name: etcd
+          image: gcr.io/etcd-development/etcd:v3.3.4
+          command:
+            - "/usr/local/bin/etcd"
+          args:
+            - "--data-dir=/var/lib/etcd"
+          volumeMounts:
+            - name: etcd-data
+              mountPath: /var/lib/etcd
+        - name: event-gateway
+          image: serverless/event-gateway:0.6.0
+          args:
+            - "-log-format=text"
+            - "-log-level=debug"
+  volumeClaimTemplates:
+    - metadata:
+        name: etcd-data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10Gi
+
