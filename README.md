@@ -133,6 +133,8 @@ Review the Cloud Functions logs:
 ```
 gcloud beta functions logs read helloworld
 ```
+
+```
 D      helloworld  fci0br44qorr  2018-04-26 14:42:23.042  Function execution started
 D      helloworld  fci0br44qorr  2018-04-26 14:42:23.319  Function execution took 277 ms, finished with status code: 200
 ```
