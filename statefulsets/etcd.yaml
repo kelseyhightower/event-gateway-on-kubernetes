@@ -1,33 +1,30 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: event-gateway
+  name: etcd
 spec:
-  type: LoadBalancer
   ports:
-    - name: events
-      port: 4000
-    - name: config
-      port: 4001
+    - name: etcd
+      port: 2379
   selector:
-    app: event-gateway
+    app: etcd
 ---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: event-gateway
+  name: etcd
   labels:
-    app: event-gateway
+    app: etcd
 spec:
-  serviceName: "event-gateway"
+  serviceName: etcd
   selector:
     matchLabels:
-      app: event-gateway
+      app: etcd
   replicas: 1
   template:
     metadata:
       labels:
-        app: event-gateway
+        app: etcd
     spec:
       containers:
         - name: etcd
@@ -36,14 +33,12 @@ spec:
             - "/usr/local/bin/etcd"
           args:
             - "--data-dir=/var/lib/etcd"
+            - "--listen-client-urls=http://0.0.0.0:2379"
+            - "--advertise-client-urls=http://0.0.0.0:2379"
+            - "--listen-peer-urls=http://0.0.0.0:2380"
           volumeMounts:
             - name: etcd-data
               mountPath: /var/lib/etcd
-        - name: event-gateway
-          image: serverless/event-gateway:0.6.0
-          args:
-            - "-log-format=text"
-            - "-log-level=debug"
   volumeClaimTemplates:
     - metadata:
         name: etcd-data
@@ -53,4 +48,3 @@ spec:
         resources:
           requests:
             storage: 10Gi
-

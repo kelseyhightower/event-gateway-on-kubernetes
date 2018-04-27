@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: event-gateway
+spec:
+  type: LoadBalancer
+  ports:
+    - name: events
+      port: 4000
+    - name: config
+      port: 4001
+  selector:
+    app: event-gateway
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: event-gateway
+  labels:
+    app: event-gateway
+spec:
+  selector:
+    matchLabels:
+      app: event-gateway
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: event-gateway
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - event-gateway
+              topologyKey: kubernetes.io/hostname
+      containers:
+        - name: event-gateway
+          image: serverless/event-gateway:0.7.0
+          args:
+            - "-db-hosts=etcd:2379"
+            - "-log-format=text"
+            - "-log-level=debug"

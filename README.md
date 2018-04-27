@@ -22,7 +22,11 @@ gcloud container clusters create event-gateway \
 Create the `event-gateway` statefulset:
 
 ```
-kubectl apply -f event-gateway.yaml
+kubectl apply -f statefulsets/etcd.yaml
+```
+
+```
+kubectl apply -f deployments/event-gateway.yaml
 ```
 
 List the running pods:
@@ -31,14 +35,17 @@ List the running pods:
 kubectl get pods
 ```
 ```
-NAME              READY     STATUS    RESTARTS   AGE
-event-gateway-0   2/2       Running   0          7m
+NAME                            READY     STATUS    RESTARTS   AGE
+etcd-0                          1/1       Running   0          1m
+event-gateway-cff6df9cd-89dlr   1/1       Running   0          30s
+event-gateway-cff6df9cd-f42q6   1/1       Running   0          30s
+event-gateway-cff6df9cd-mrtfs   1/1       Running   0          30s
 ```
 
 At this point the Event Gateway is up and running and exposed via an external loadbalancer.
 
 ```
-kubectl get svc
+kubectl get svc event-gateway
 ```
 ```
 NAME                  TYPE           CLUSTER-IP      EXTERNAL-IP     PORT(S)                         AGE
@@ -90,8 +97,8 @@ Register the `helloworld` function:
 cat > register-function.json <<EOF
 {
   "functionId": "helloworld",
+  "type": "http",
   "provider":{
-    "type": "http",
     "url": "${FUNCTION_URL}"
   }
 }
@@ -133,18 +140,3 @@ Review the Cloud Functions logs:
 ```
 gcloud beta functions logs read helloworld
 ```
-
-```
-D      helloworld  fci0br44qorr  2018-04-26 14:42:23.042  Function execution started
-D      helloworld  fci0br44qorr  2018-04-26 14:42:23.319  Function execution took 277 ms, finished with status code: 200
-```
-
-Review the Event Gateway logs:
-
-```
-kubectl logs event-gateway-0 -c event-gateway
-```
-```
-2018-04-26T14:42:23.319Z        DEBUG   Function invoked.       {"space": "default", "functionId": "helloworld", "event": {"type": "test.event", "id": "65f3ab92-4ec4-4fbb-8d99-d808ab01a8f8", "receivedAt": 1524753742773, "data": "{\"message\":\"Hello!\"}", "dataType": "application/json"}, "result": "Success: Hello!"}
-```
-
