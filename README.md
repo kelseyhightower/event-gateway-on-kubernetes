@@ -19,17 +19,21 @@ gcloud container clusters create event-gateway \
 
 ### Deploy the Event Gateway
 
-Create the `event-gateway` statefulset:
+In this section you will create a three node Event Gateway cluster backed by a single node etcd cluster.
+
+Create the `etcd` statefulset:
 
 ```
 kubectl apply -f statefulsets/etcd.yaml
 ```
 
+Create the `event-gateway` deployment:
+
 ```
 kubectl apply -f deployments/event-gateway.yaml
 ```
 
-List the running pods:
+At this point the Event Gateway should be up and running and exposed via an external loadbalancer.
 
 ```
 kubectl get pods
@@ -42,7 +46,7 @@ event-gateway-cff6df9cd-f42q6   1/1       Running   0          30s
 event-gateway-cff6df9cd-mrtfs   1/1       Running   0          30s
 ```
 
-At this point the Event Gateway is up and running and exposed via an external loadbalancer.
+Print the `event-gateway` service details:
 
 ```
 kubectl get svc event-gateway
