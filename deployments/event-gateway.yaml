@@ -45,3 +45,11 @@ spec:
             - "-db-hosts=etcd:2379"
             - "-log-format=text"
             - "-log-level=debug"
+          livenessProbe:
+            httpGet:
+              path: "/v1/status"
+              port: 4001
+          readinessProbe:
+            httpGet:
+              path: "/v1/status"
+              port: 4001
