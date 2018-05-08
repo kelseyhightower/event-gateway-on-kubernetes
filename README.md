@@ -250,6 +250,7 @@ kubectl logs helloworld-749c6b5df7-d24qh
 ```
 
 ```
-2018/05/08 15:22:21 Starting HTTP server...
-{"eventType":"test.event","cloudEventsVersion":"0.1","source":"https://serverless.com/event-gateway/#transformationVersion=0.1","eventID":"88ff4254-bdff-45bd-bb3a-d2f69d75920a","eventTime":"2018-05-08T15:28:24.172992279Z","extensions":{"eventgateway":{"transformation-version":"0.1","transformed":true}},"contentType":"application/json","data":{"message":"Hello!"}}
+2018/05/08 15:54:09 Starting HTTP server...
+2018/05/08 15:54:18 Handling event a8b15854-0aa8-483d-979f-0c73d36173bd from https://serverless.com/event-gateway/#transformationVersion=0.1 ...
+map[message:Hello!]
 ```
