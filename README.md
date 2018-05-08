@@ -26,7 +26,7 @@ gcloud container clusters create event-gateway \
   --zone us-west1-c
 ```
 
-### Bootstrapping an Event Gateway Cluster
+## Bootstrapping an Event Gateway Cluster
 
 In this section you will create a two node Event Gateway cluster backed by a single node etcd cluster. This deployment is only suitable for learning and demonstration purposes. This configuration is not recommend for production.
 
