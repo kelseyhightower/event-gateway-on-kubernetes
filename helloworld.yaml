@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: helloworld
+spec:
+  ports:
+    - name: http
+      port: 80
+  selector:
+    app: helloworld
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: helloworld
+  labels:
+    app: helloworld
+spec:
+  selector:
+    matchLabels:
+      app: helloworld
+  template:
+    metadata:
+      labels:
+        app: helloworld
+    spec:
+      containers:
+        - name: helloworld
+          imagePullPolicy: Always
+          image: gcr.io/hightowerlabs/helloworld:event-gateway

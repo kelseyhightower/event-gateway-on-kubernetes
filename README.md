@@ -2,6 +2,8 @@
 
 This guide will walk you through provisioning a multi-node [Event Gateway](https://github.com/serverless/event-gateway) cluster on Kubernetes. The goal of this guide is to introduce you to the Event Gateway and get a feel for the role it plays in a Serverless Architecture.
 
+This guide will also demostrate how events can be routed across a diverse set of computing environments including Function as a Service (FaaS) offerings and containers running on Kubernetes. 
+
 ## Tutorial
 
 This tutorial assumes you have access to a Kubernetes 1.9.6+ cluster and [Google Cloud Functions](https://cloud.google.com/functions)*.
@@ -170,4 +172,84 @@ Review the Cloud Functions logs:
 
 ```
 gcloud beta functions logs read helloworld
+```
+
+## Routing Events to Containers
+
+```
+kubectl apply -f helloworld.yaml
+```
+
+```
+kubectl get pods
+```
+```
+NAME                             READY     STATUS    RESTARTS   AGE
+etcd-0                           1/1       Running   0          3m
+event-gateway-5ff8554766-9x2zx   1/1       Running   0          1m
+event-gateway-5ff8554766-kqwwg   1/1       Running   0          1m
+helloworld-749c6b5df7-d24qh      1/1       Running   0          1m
+```
+
+Register the `helloworld` container. Create the function registration request body:
+
+```
+cat > register-container.json <<EOF
+{
+  "functionId": "helloworld-container",
+  "type": "http",
+  "provider":{
+    "url": "http://helloworld.default.svc.cluster.local"
+  }
+}
+EOF
+```
+
+Post the function registration to the Event Gateway:
+
+```
+curl --request POST \
+  --url http://${EVENT_GATEWAY_IP}:4001/v1/spaces/default/functions \
+  --header 'content-type: application/json' \
+  --data @register-container.json
+```
+
+At this point the `helloworld` Pod has been registered with the Event Gateway, but before it can receive events a subscription must be created.
+
+### Create a Subscription
+
+A subscription binds an event to function. Multiple subscriptions can be used to broadcast a single event across multiple functions.
+
+Post an event subscription to the Event Gateway which binds the `helloworld` Pod to a custom event named `test.event`:
+
+```
+curl --request POST \
+  --url http://${EVENT_GATEWAY_IP}:4001/v1/spaces/default/subscriptions \
+  --header 'content-type: application/json' \
+  --data '{
+    "functionId": "helloworld-container",
+    "event": "test.event",
+    "path": "/"
+  }'
+```
+
+### Emit an event
+
+```
+curl --request POST \
+  --url http://${EVENT_GATEWAY_IP}:4000/ \
+  --header 'content-type: application/json' \
+  --header 'event: test.event' \
+  --data '{"message": "Hello!"}'
+```
+
+Review the `helloworld` Pod logs:
+
+```
+kubectl logs helloworld-749c6b5df7-d24qh
+```
+
+```
+2018/05/08 15:22:21 Starting HTTP server...
+{"eventType":"test.event","cloudEventsVersion":"0.1","source":"https://serverless.com/event-gateway/#transformationVersion=0.1","eventID":"88ff4254-bdff-45bd-bb3a-d2f69d75920a","eventTime":"2018-05-08T15:28:24.172992279Z","extensions":{"eventgateway":{"transformation-version":"0.1","transformed":true}},"contentType":"application/json","data":{"message":"Hello!"}}
 ```
