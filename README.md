@@ -37,7 +37,7 @@ etcd is used to store and broadcast configuration across an Event Gateway cluste
 Create the `etcd` statefulset:
 
 ```
-kubectl apply -f etcd.yaml
+kubectl apply -f statefulsets/etcd.yaml
 ```
 
 Verify `etcd` is up and running:
@@ -55,7 +55,7 @@ etcd-0    1/1       Running   0          50s
 Create the `event-gateway` deployment:
 
 ```
-kubectl apply -f event-gateway.yaml
+kubectl apply -f deployments/event-gateway.yaml
 ```
 
 At this point the Event Gateway should be up and running and exposed via an external loadbalancer.
@@ -94,39 +94,31 @@ EVENT_GATEWAY_IP=$(kubectl get svc \
 
 In this section you will write and deploy a Google Cloud Function which will be used to test the event routing functionality of the Event Gateway cluster.
 
-Create the `helloworld` function:
+Deploy the `echo` function:
 
 ```
-cat > index.js <<EOF
-exports.helloworld = (req, res) => {
-  res.status(200).send('Success: ' + req.body.data.message);
-};
-EOF
+gcloud beta functions deploy echo \
+  --source echo-function \
+  --trigger-http
 ```
 
-Deploy the `helloworld` function:
+Get the HTTPS URL assigned to the `echo` function and store it:
 
 ```
-gcloud beta functions deploy helloworld --trigger-http
-```
-
-Get the HTTPS URL assigned to the `helloworld` function and store it:
-
-```
-export FUNCTION_URL=$(gcloud beta functions describe helloworld \
+export FUNCTION_URL=$(gcloud beta functions describe echo \
   --format 'value(httpsTrigger.url)')
 ```
 
-### Register the helloworld Goole Cloud Function
+### Register the echo Goole Cloud Function
 
-In this section you will register the `helloworld` function with the Event Gateway.
+In this section you will register the `echo` function with the Event Gateway.
 
-Register the `helloworld` function. Create the function registration request body:
+Register the `echo` function. Create the function registration request body:
 
 ```
 cat > register-function.json <<EOF
 {
-  "functionId": "helloworld",
+  "functionId": "echo",
   "type": "http",
   "provider":{
     "url": "${FUNCTION_URL}"
@@ -144,84 +136,101 @@ curl --request POST \
   --data @register-function.json
 ```
 
-At this point the `helloworld` cloud function has been registered with the Event Gateway, but before it can receive events a subscription must be created.
+At this point the `echo` cloud function has been registered with the Event Gateway, but before it can receive events a subscription must be created.
 
 ### Create a Subscription
 
-A subscription binds an event to function. Multiple subscriptions can be used to broadcast a single event across multiple functions.
-
-Post an event subscription to the Event Gateway which binds the `helloworld` function to a custom event named `test.event`:
+A subscription binds an event to a function. Create an HTTP event subscription which binds the `echo` function to a HTTP event on the `/` path and the `POST` method:
 
 ```
 curl --request POST \
   --url http://${EVENT_GATEWAY_IP}:4001/v1/spaces/default/subscriptions \
   --header 'content-type: application/json' \
   --data '{
-    "functionId": "helloworld",
-    "event": "test.event",
+    "functionId": "echo",
+    "event": "http",
+    "method": "POST",
     "path": "/"
   }'
 ```
 
-### Emit an event
+### Emit an HTTP Event
 
 ```
-curl --request POST \
+curl -i --request POST \
   --url http://${EVENT_GATEWAY_IP}:4000/ \
-  --header 'content-type: application/json' \
-  --header 'event: test.event' \
-  --data '{"message": "Hello!"}'
+  --data '{"message": "Hello world!"}'
+```
+
+```
+HTTP/1.1 200 OK
+Date: Tue, 08 May 2018 22:16:15 GMT
+Content-Length: 27
+Content-Type: text/plain; charset=utf-8
+
+{"message": "Hello world!"}
 ```
 
 Review the Cloud Functions logs:
 
 ```
-gcloud beta functions logs read helloworld
+gcloud beta functions logs read echo
+```
+
+```
+LEVEL  NAME  EXECUTION_ID  TIME_UTC                 LOG
+D      echo  vu7o6qv5i8dl  2018-05-08 22:31:20.326  Function execution started
+I      echo  vu7o6qv5i8dl  2018-05-08 22:31:20.332  Handling HTTP event b6624b75-ca8a-4c97-86d9-fa98881dfdd8
+D      echo  vu7o6qv5i8dl  2018-05-08 22:31:20.337  Function execution took 12 ms, finished with status code: 200
 ```
 
 ## Routing Events to Kubernetes Services
 
-In this section you will deploy the `helloworld:event-gateway` container using Kubernetes and route cloud events to it using the Event Gateway.
+In this section you will deploy the `echo:event-gateway` container using Kubernetes and route cloud events to it using the Event Gateway.
 
-Create a `helloworld` Kubernetes deployment and service:
-
-```
-kubectl create -f helloworld.yaml
-```
+Create a `echo` Kubernetes deployment and service:
 
 ```
-service "helloworld" created
-deployment "helloworld" created
+kubectl create -f deployments/echo.yaml
 ```
 
-Register the Kubernetes `helloworld` service with the Event Gateway:
+```
+deployment "echo" created
+service "echo" created
+```
+
+Register the Kubernetes `echo` service with the Event Gateway:
 
 ```
 curl --request POST \
   --url http://${EVENT_GATEWAY_IP}:4001/v1/spaces/default/functions \
   --header 'content-type: application/json' \
   --data '{
-    "functionId": "helloworld-service",
+    "functionId": "echo-service",
     "type": "http",
     "provider":{
-      "url": "http://helloworld.default.svc.cluster.local"
+      "url": "http://echo.default.svc.cluster.local"
     }
   }'
 ```
 
-> At this point the `helloworld` service has been registered with the Event Gateway, but before it can receive events a subscription must be created.
+> At this point the `echo` service has been registered with the Event Gateway, but before it can receive events a subscription must be created.
+
+```
+curl -X DELETE \
+  http://${EVENT_GATEWAY_IP}:4001/v1/spaces/default/subscriptions/http,POST,%2F
+```
 
 ### Create a Subscription
-
-Post an event subscription to the Event Gateway which binds the `helloworld` Pod to a custom event named `test.event`:
 
 ```
 curl --request POST \
   --url http://${EVENT_GATEWAY_IP}:4001/v1/spaces/default/subscriptions \
   --header 'content-type: application/json' \
   --data '{
-    "functionId": "helloworld-service",
-    "event": "test.event",
+    "functionId": "echo-service",
+    "event": "http",
+    "method": "POST",
     "path": "/"
   }'
 ```
@@ -231,19 +240,16 @@ curl --request POST \
 ```
 curl --request POST \
   --url http://${EVENT_GATEWAY_IP}:4000/ \
-  --header 'content-type: application/json' \
-  --header 'event: test.event' \
-  --data '{"message": "Hello!"}'
+  --data '{"message": "Hello World!"}'
 ```
 
-Review the `helloworld` container logs:
+Review the `echo` container logs:
 
 ```
-kubectl logs helloworld-749c6b5df7-d24qh
+kubectl logs echo-77d48cb484-swxhg
 ```
 
 ```
-2018/05/08 15:54:09 Starting HTTP server...
-2018/05/08 15:54:18 Handling event a8b15854-0aa8-483d-979f-0c73d36173bd from https://serverless.com/event-gateway/#transformationVersion=0.1 ...
-map[message:Hello!]
+2018/05/08 22:26:51 Starting HTTP server...
+2018/05/08 22:26:57 Handling HTTP event 144685d9-b9da-487c-b5f8-5f13d3f477b8 ...
 ```

@@ -1,0 +1,22 @@
+{
+  "eventType":"http",
+  "cloudEventsVersion":"0.1",
+  "source":"https://serverless.com/event-gateway/#transformationVersion=0.1",
+  "eventID":"cf7275c1-de03-48b2-a3d5-a827c242ee98",
+  "eventTime":"2018-05-08T21:30:59.312754045Z",
+  "contentType":"application/x-www-form-urlencoded",
+  "data":{
+    "headers":{
+      "Accept":"*/*",
+      "Content-Length":"27",
+      "Content-Type":"application/x-www-form-urlencoded",
+      "User-Agent":"curl/7.52.1"
+    },
+    "query":{},
+    "body":"{\"message\": \"Hello World!\"}",
+    "host":"35.233.169.168:4000",
+    "path":"/",
+    "method":"POST",
+    "params":null
+  }
+}

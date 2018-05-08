@@ -6,7 +6,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -20,6 +19,22 @@ type CloudEvent struct {
 	Source             string      `json:"source"`
 	EventTime          string      `json:"eventTime"`
 	Data               interface{} `json:"data"`
+}
+
+type HTTPEvent struct {
+	Path    string            `json:"path"`
+	Method  string            `json:"method"`
+	Headers map[string]string `json:"headers"`
+	Host    string            `json:"host"`
+	Query   map[string]string `json:"query"`
+	Params  map[string]string `json:"params"`
+	Body    string            `json:"body"`
+}
+
+type HTTPResponse struct {
+	Body       string            `json:"body"`
+	StatusCode int               `json:"statusCode"`
+	Headers    map[string]string `json:"headers,omitempty"`
 }
 
 func main() {
@@ -42,16 +57,28 @@ func main() {
 			return
 		}
 
-		log.Printf("Handling event %s (%s) ...", ce.EventID, ce.EventType)
+		log.Printf("Handling HTTP event %s ...", ce.EventID)
 
-		m, err := toMap(ce.Data)
+		e, err := httpEvent(ce.Data)
 		if err != nil {
 			log.Println(err)
 			w.WriteHeader(500)
 			return
 		}
 
-		fmt.Println(m["message"])
+		response := HTTPResponse{
+			Body:       string(e.Body),
+			StatusCode: 200,
+		}
+
+		data, err = json.MarshalIndent(&response, "", " ")
+		if err != nil {
+			log.Println(err)
+			w.WriteHeader(500)
+			return
+		}
+
+		w.Write(data)
 	})
 
 	if err := http.ListenAndServe(":80", nil); err != nil {
@@ -59,17 +86,19 @@ func main() {
 	}
 }
 
-func toMap(v interface{}) (map[string]string, error) {
+func httpEvent(v interface{}) (*HTTPEvent, error) {
 	data, err := json.Marshal(v)
 	if err != nil {
+		log.Println("can't marshal HTTP event")
 		return nil, err
 	}
 
-	var m map[string]string
+	var e HTTPEvent
 
-	if err := json.Unmarshal(data, &m); err != nil {
+	if err := json.Unmarshal(data, &e); err != nil {
+		log.Println("can't unmarshal HTTP event")
 		return nil, err
 	}
 
-	return m, nil
+	return &e, nil
 }
