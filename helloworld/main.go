@@ -1,3 +1,7 @@
+// Copyright 2018 Google Inc. All Rights Reserved.
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+
 package main
 
 import (
@@ -17,6 +21,8 @@ type CloudEvent struct {
 	EventTime          string      `json:"eventTime"`
 	Data               interface{} `json:"data"`
 }
+
+type Message map[string]string
 
 func main() {
 	log.Println("Starting HTTP server...")
@@ -40,10 +46,32 @@ func main() {
 
 		log.Printf("Handling event %s from %s ...", ce.EventID, ce.Source)
 
-		fmt.Println(ce.Data)
+		m, err := toMap(ce.Data)
+		if err != nil {
+			log.Println(err)
+			w.WriteHeader(500)
+			return
+		}
+
+		fmt.Println(m["message"])
 	})
 
 	if err := http.ListenAndServe(":80", nil); err != nil {
 		log.Fatal(err)
 	}
+}
+
+func toMap(v interface{}) (map[string]string, error) {
+	data, err := json.Marshal(v)
+	if err != nil {
+		return nil, err
+	}
+
+	var m map[string]string
+
+	if err := json.Unmarshal(data, &m); err != nil {
+		return nil, err
+	}
+
+	return m, nil
 }
