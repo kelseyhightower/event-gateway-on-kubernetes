@@ -17,7 +17,7 @@ gcloud container clusters create event-gateway \
   --zone us-west1-c
 ```
 
-> * Any backend that can respond to HTTP request will work. Google Cloud Functions is only being used to streamline the learning process.
+> Any backend that can respond to HTTP request will work. Google Cloud Functions is only being used to streamline the learning process.
 
 ### Deploy the Event Gateway
 
