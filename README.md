@@ -1,10 +1,10 @@
 # Serverless Event Gateway on Kubernetes
 
-This guide will walk you through provisioning a single node [Event Gateway](https://github.com/serverless/event-gateway) cluster on Kubernetes. The goal of this guide is to introduce you to the Event Gateway and get a feel for how it works. 
+This guide will walk you through provisioning a multi-node [Event Gateway](https://github.com/serverless/event-gateway) cluster on Kubernetes. The goal of this guide is to introduce you to the Event Gateway and get a feel for the role it plays in a Serverless Architecture.
 
 ## Tutorial
 
-This tutorial assumes you have access to a Kubernetes 1.9.0+ cluster and [Google Cloud Functions](https://cloud.google.com/functions).
+This tutorial assumes you have access to a Kubernetes 1.9.6+ cluster and [Google Cloud Functions](https://cloud.google.com/functions)*.
 
 ```
 gcloud container clusters create event-gateway \
@@ -16,6 +16,8 @@ gcloud container clusters create event-gateway \
   --num-nodes 3 \
   --zone us-west1-c
 ```
+
+> * Any backend that can respond to HTTP request will work. Google Cloud Functions is only being used to streamline the learning process.
 
 ### Deploy the Event Gateway
 
