@@ -6,6 +6,14 @@ This guide will also demostrate how events can be routed across a diverse set of
 
 ## Tutorial
 
+* [Creating a Kubernetes Cluster](#creating-a-kubernetes-cluster)
+* Bootstrapping an Event Gateway Cluster
+* Routing Events to Google Cloud Functions
+* Routing Events to Kubernetes Services
+
+
+## Creating a Kubernetes Cluster
+
 This tutorial assumes you have access to a Kubernetes 1.9.6+ cluster and [Google Cloud Functions](https://cloud.google.com/functions)*.
 
 ```

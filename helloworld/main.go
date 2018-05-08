@@ -22,8 +22,6 @@ type CloudEvent struct {
 	Data               interface{} `json:"data"`
 }
 
-type Message map[string]string
-
 func main() {
 	log.Println("Starting HTTP server...")
 
@@ -44,7 +42,7 @@ func main() {
 			return
 		}
 
-		log.Printf("Handling event %s from %s ...", ce.EventID, ce.Source)
+		log.Printf("Handling event %s (%s) ...", ce.EventID, ce.EventType)
 
 		m, err := toMap(ce.Data)
 		if err != nil {
