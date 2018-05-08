@@ -11,10 +11,9 @@ This guide will also demostrate how events can be routed across a diverse set of
 * [Routing Events to Google Cloud Functions](#routing-events-to-google-cloud-functions)
 * [Routing Events to Kubernetes Services](#routing-events-to-kubernetes-services)
 
+## Creating a Kubernetes Cluster
 
-### Creating a Kubernetes Cluster
-
-This tutorial assumes you have access to a Kubernetes 1.9.6+ cluster and [Google Cloud Functions](https://cloud.google.com/functions)*.
+This tutorial assumes you have access to a Kubernetes 1.9.7+ cluster. If you are using the Google Cloud Platform you can create a Kubernetes cluster using the `gcloud` command: 
 
 ```
 gcloud container clusters create event-gateway \
@@ -27,13 +26,11 @@ gcloud container clusters create event-gateway \
   --zone us-west1-c
 ```
 
-> Any backend that can respond to HTTP request will work. Google Cloud Functions is only being used to streamline the learning process.
-
 ### Bootstrapping an Event Gateway Cluster
 
 In this section you will create a two node Event Gateway cluster backed by a single node etcd cluster. This deployment is only suitable for learning and demonstration purposes. This configuration is not recommend for production.
 
-#### Create an etcd Cluster
+### Create an etcd Cluster
 
 etcd is used to store and broadcast configuration across an Event Gateway cluster.
 
@@ -53,7 +50,7 @@ NAME      READY     STATUS    RESTARTS   AGE
 etcd-0    1/1       Running   0          50s
 ```
 
-#### Create an Event Gateway Cluster
+### Create an Event Gateway Cluster
 
 Create the `event-gateway` deployment:
 
@@ -93,7 +90,7 @@ EVENT_GATEWAY_IP=$(kubectl get svc \
   -o jsonpath={.status.loadBalancer.ingress[0].ip})
 ```
 
-### Routing Events to Google Cloud Functions
+## Routing Events to Google Cloud Functions
 
 In this section you will write and deploy a Google Cloud Function which will be used to test the event routing functionality of the Event Gateway cluster.
 
@@ -120,7 +117,7 @@ export FUNCTION_URL=$(gcloud beta functions describe helloworld \
   --format 'value(httpsTrigger.url)')
 ```
 
-#### Register the Helloworld Goole Cloud Function
+### Register the helloworld Goole Cloud Function
 
 In this section you will register the `helloworld` function with the Event Gateway.
 
@@ -149,7 +146,7 @@ curl --request POST \
 
 At this point the `helloworld` cloud function has been registered with the Event Gateway, but before it can receive events a subscription must be created.
 
-#### Create a Subscription
+### Create a Subscription
 
 A subscription binds an event to function. Multiple subscriptions can be used to broadcast a single event across multiple functions.
 
@@ -166,7 +163,7 @@ curl --request POST \
   }'
 ```
 
-#### Emit an event
+### Emit an event
 
 ```
 curl --request POST \
@@ -182,51 +179,39 @@ Review the Cloud Functions logs:
 gcloud beta functions logs read helloworld
 ```
 
-### Routing Events to Kubernetes Services
+## Routing Events to Kubernetes Services
+
+In this section you will deploy the `helloworld:event-gateway` container using Kubernetes and route cloud events to it using the Event Gateway.
+
+Create a `helloworld` Kubernetes deployment and service:
 
 ```
-kubectl apply -f helloworld.yaml
+kubectl create -f helloworld.yaml
 ```
 
 ```
-kubectl get pods
-```
-```
-NAME                             READY     STATUS    RESTARTS   AGE
-etcd-0                           1/1       Running   0          3m
-event-gateway-5ff8554766-9x2zx   1/1       Running   0          1m
-event-gateway-5ff8554766-kqwwg   1/1       Running   0          1m
-helloworld-749c6b5df7-d24qh      1/1       Running   0          1m
+service "helloworld" created
+deployment "helloworld" created
 ```
 
-Register the `helloworld` container. Create the function registration request body:
-
-```
-cat > register-container.json <<EOF
-{
-  "functionId": "helloworld-container",
-  "type": "http",
-  "provider":{
-    "url": "http://helloworld.default.svc.cluster.local"
-  }
-}
-EOF
-```
-
-Post the function registration to the Event Gateway:
+Register the Kubernetes `helloworld` service with the Event Gateway:
 
 ```
 curl --request POST \
   --url http://${EVENT_GATEWAY_IP}:4001/v1/spaces/default/functions \
   --header 'content-type: application/json' \
-  --data @register-container.json
+  --data '{
+    "functionId": "helloworld-service",
+    "type": "http",
+    "provider":{
+      "url": "http://helloworld.default.svc.cluster.local"
+    }
+  }'
 ```
 
-At this point the `helloworld` Pod has been registered with the Event Gateway, but before it can receive events a subscription must be created.
+> At this point the `helloworld` service has been registered with the Event Gateway, but before it can receive events a subscription must be created.
 
 ### Create a Subscription
-
-A subscription binds an event to function. Multiple subscriptions can be used to broadcast a single event across multiple functions.
 
 Post an event subscription to the Event Gateway which binds the `helloworld` Pod to a custom event named `test.event`:
 
@@ -235,7 +220,7 @@ curl --request POST \
   --url http://${EVENT_GATEWAY_IP}:4001/v1/spaces/default/subscriptions \
   --header 'content-type: application/json' \
   --data '{
-    "functionId": "helloworld-container",
+    "functionId": "helloworld-service",
     "event": "test.event",
     "path": "/"
   }'
@@ -251,7 +236,7 @@ curl --request POST \
   --data '{"message": "Hello!"}'
 ```
 
-Review the `helloworld` Pod logs:
+Review the `helloworld` container logs:
 
 ```
 kubectl logs helloworld-749c6b5df7-d24qh
