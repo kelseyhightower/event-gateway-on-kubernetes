@@ -22,7 +22,7 @@ spec:
   selector:
     matchLabels:
       app: event-gateway
-  replicas: 3
+  replicas: 2
   template:
     metadata:
       labels:

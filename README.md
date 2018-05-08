@@ -11,7 +11,7 @@ gcloud container clusters create event-gateway \
   --async \
   --enable-autorepair \
   --enable-network-policy \
-  --cluster-version 1.9.6-gke.1 \
+  --cluster-version 1.9.7-gke.0 \
   --machine-type n1-standard-2 \
   --num-nodes 3 \
   --zone us-west1-c
@@ -21,18 +21,34 @@ gcloud container clusters create event-gateway \
 
 ### Deploy the Event Gateway
 
-In this section you will create a three node Event Gateway cluster backed by a single node etcd cluster.
+In this section you will create a two node Event Gateway cluster backed by a single node etcd cluster. This deployment is only suitable for learning and demonstration purposes. This configuration is not recommend for production.
+
+#### Create an etcd Cluster
+
+etcd is used to store and broadcast configuration across an Event Gateway cluster.
 
 Create the `etcd` statefulset:
 
 ```
-kubectl apply -f statefulsets/etcd.yaml
+kubectl apply -f etcd.yaml
 ```
+
+Verify `etcd` is up and running:
+
+```
+kubectl get pods
+```
+```
+NAME      READY     STATUS    RESTARTS   AGE
+etcd-0    1/1       Running   0          50s
+```
+
+#### Create an Event Gateway Cluster
 
 Create the `event-gateway` deployment:
 
 ```
-kubectl apply -f deployments/event-gateway.yaml
+kubectl apply -f event-gateway.yaml
 ```
 
 At this point the Event Gateway should be up and running and exposed via an external loadbalancer.
@@ -41,11 +57,10 @@ At this point the Event Gateway should be up and running and exposed via an exte
 kubectl get pods
 ```
 ```
-NAME                            READY     STATUS    RESTARTS   AGE
-etcd-0                          1/1       Running   0          1m
-event-gateway-cff6df9cd-89dlr   1/1       Running   0          30s
-event-gateway-cff6df9cd-f42q6   1/1       Running   0          30s
-event-gateway-cff6df9cd-mrtfs   1/1       Running   0          30s
+NAME                             READY     STATUS    RESTARTS   AGE
+etcd-0                           1/1       Running   0          2m
+event-gateway-5ff8554766-9x2zx   1/1       Running   0          15s
+event-gateway-5ff8554766-kqwwg   1/1       Running   0          15s
 ```
 
 Print the `event-gateway` service details:
@@ -69,6 +84,8 @@ EVENT_GATEWAY_IP=$(kubectl get svc \
 ```
 
 ### Create a Google Cloud Function
+
+In this section you will write and deploy a Google Cloud Function which will be used to test the event routing functionality of the Event Gateway cluster.
 
 Create the `helloworld` function:
 
@@ -97,7 +114,7 @@ export FUNCTION_URL=$(gcloud beta functions describe helloworld \
 
 In this section you will register the `helloworld` function with the Event Gateway.
 
-Register the `helloworld` function:
+Register the `helloworld` function. Create the function registration request body:
 
 ```
 cat > register-function.json <<EOF
@@ -111,6 +128,8 @@ cat > register-function.json <<EOF
 EOF
 ```
 
+Post the function registration to the Event Gateway:
+
 ```
 curl --request POST \
   --url http://${EVENT_GATEWAY_IP}:4001/v1/spaces/default/functions \
@@ -118,7 +137,13 @@ curl --request POST \
   --data @register-function.json
 ```
 
-### Create a subscription
+At this point the `helloworld` cloud function has been registered with the Event Gateway, but before it can receive events a subscription must be created.
+
+### Create a Subscription
+
+A subscription binds an event to function. Multiple subscriptions can be used to broadcast a single event across multiple functions.
+
+Post an event subscription to the Event Gateway which binds the `helloworld` function to a custom event named `test.event`:
 
 ```
 curl --request POST \

@@ -1,0 +1,7 @@
+{
+  "functionId": "helloworld",
+  "type": "http",
+  "provider":{
+    "url": "https://us-central1-hightowerlabs.cloudfunctions.net/helloworld"
+  }
+}
