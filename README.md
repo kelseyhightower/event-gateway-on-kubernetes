@@ -261,12 +261,15 @@ curl -i --request POST \
 
 ```
 HTTP/1.1 200 OK
+Compute-Type: container
 Date: Tue, 08 May 2018 23:35:35 GMT
 Content-Length: 27
 Content-Type: text/plain; charset=utf-8
 
 {"message": "Hello World!"}
 ```
+
+> Notice the value of the `Compute-Type` HTTP header. It was set to `container` by the echo service.
 
 Review the `echo` container logs:
 

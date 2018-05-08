@@ -66,8 +66,12 @@ func main() {
 			return
 		}
 
+		headers := make(map[string]string)
+		headers["Compute-Type"] = "container"
+
 		response := HTTPResponse{
 			Body:       string(e.Body),
+			Headers:    headers,
 			StatusCode: 200,
 		}
 
