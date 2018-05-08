@@ -4,8 +4,6 @@ This guide will walk you through provisioning a multi-node [Event Gateway](https
 
 This guide will also demostrate how events can be routed across a diverse set of computing environments including Function as a Service (FaaS) offerings and containers running on Kubernetes. 
 
-![Event Gateway Diagram](eg.png)
-
 ## Tutorial
 
 * [Creating a Kubernetes Cluster](#creating-a-kubernetes-cluster)
