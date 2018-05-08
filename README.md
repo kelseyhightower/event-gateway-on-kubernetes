@@ -7,12 +7,12 @@ This guide will also demostrate how events can be routed across a diverse set of
 ## Tutorial
 
 * [Creating a Kubernetes Cluster](#creating-a-kubernetes-cluster)
-* Bootstrapping an Event Gateway Cluster
-* Routing Events to Google Cloud Functions
-* Routing Events to Kubernetes Services
+* [Bootstrapping an Event Gateway Cluster](#bootstrapping-an-event-gateway-cluster)
+* [Routing Events to Google Cloud Functions](#routing-events-to-google-cloud-functions)
+* [Routing Events to Kubernetes Services](#routing-events-to-kubernetes-services)
 
 
-## Creating a Kubernetes Cluster
+### Creating a Kubernetes Cluster
 
 This tutorial assumes you have access to a Kubernetes 1.9.6+ cluster and [Google Cloud Functions](https://cloud.google.com/functions)*.
 
@@ -29,7 +29,7 @@ gcloud container clusters create event-gateway \
 
 > Any backend that can respond to HTTP request will work. Google Cloud Functions is only being used to streamline the learning process.
 
-### Deploy the Event Gateway
+### Bootstrapping an Event Gateway Cluster
 
 In this section you will create a two node Event Gateway cluster backed by a single node etcd cluster. This deployment is only suitable for learning and demonstration purposes. This configuration is not recommend for production.
 
@@ -93,7 +93,7 @@ EVENT_GATEWAY_IP=$(kubectl get svc \
   -o jsonpath={.status.loadBalancer.ingress[0].ip})
 ```
 
-### Create a Google Cloud Function
+### Routing Events to Google Cloud Functions
 
 In this section you will write and deploy a Google Cloud Function which will be used to test the event routing functionality of the Event Gateway cluster.
 
@@ -120,7 +120,7 @@ export FUNCTION_URL=$(gcloud beta functions describe helloworld \
   --format 'value(httpsTrigger.url)')
 ```
 
-### Register the Helloworld Goole Cloud Function
+#### Register the Helloworld Goole Cloud Function
 
 In this section you will register the `helloworld` function with the Event Gateway.
 
@@ -149,7 +149,7 @@ curl --request POST \
 
 At this point the `helloworld` cloud function has been registered with the Event Gateway, but before it can receive events a subscription must be created.
 
-### Create a Subscription
+#### Create a Subscription
 
 A subscription binds an event to function. Multiple subscriptions can be used to broadcast a single event across multiple functions.
 
@@ -166,7 +166,7 @@ curl --request POST \
   }'
 ```
 
-### Emit an event
+#### Emit an event
 
 ```
 curl --request POST \
@@ -182,7 +182,7 @@ Review the Cloud Functions logs:
 gcloud beta functions logs read helloworld
 ```
 
-## Routing Events to Containers
+### Routing Events to Kubernetes Services
 
 ```
 kubectl apply -f helloworld.yaml
