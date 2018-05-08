@@ -176,12 +176,15 @@ The `echo` cloud function will respond with the data submitted in the HTTP reque
 
 ```
 HTTP/1.1 200 OK
+Compute-Type: function
 Date: Tue, 08 May 2018 22:16:15 GMT
 Content-Length: 27
 Content-Type: text/plain; charset=utf-8
 
 {"message": "Hello world!"}
 ```
+
+> Notice the value of the `Compute-Type` HTTP header. It was set to `function` by the echo cloud function.
 
 Review the Cloud Functions logs:
 

@@ -1,8 +1,12 @@
 exports.echo = (req, res) => {
   console.log(`Handling HTTP event ${req.body.eventID}`)
 
-  var json = JSON.stringify({ 
+  var headers = new Object();
+  headers['Compute-Type'] = 'function';
+
+  var json = JSON.stringify({
     body: req.body.data.body,
+    headers: headers,
     statusCode: 200, 
   });
 
