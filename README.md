@@ -204,9 +204,9 @@ D      echo  4uczimni6d70  2018-05-08 23:24:11.546  Function execution took 341 
 
 ## Routing Events to Kubernetes Services
 
-In most Serverless deployments events are typically routed to functions running on a hosted FaaS platform such as [Google Cloud Functions](https://cloud.google.com/functions) or [AWS Lambda](https://aws.amazon.com/lambda). However this is not a hard requirement. Events can be routed to any HTTP endpoint, including endpoints backed by containers running on Kubernetes.
+In modern Serverless architectures events are typically routed to functions running on fully managed FaaS platforms such as [Google Cloud Functions](https://cloud.google.com/functions) or [AWS Lambda](https://aws.amazon.com/lambda). In some situations, such as low latency requirements, it maybe preferable to route events to existing application running on traditional infrastructure.
 
-In this section you will deploy the `gcr.io/hightowerlabs/echo:event-gateway` container using Kubernetes and route HTTP events to it.
+In this section you will deploy the `echo` application using Kubernetes and configure the Event Gateway to route HTTP events to it.
 
 Create the `echo` deployment and service:
 
