@@ -2,7 +2,7 @@
 
 This guide walks you through provisioning a multi-node [Event Gateway](https://github.com/serverless/event-gateway) cluster on Kubernetes. This guide also demostrates how events can be routed across a diverse set of computing environments including Function as a Service (FaaS) offerings and containers running on Kubernetes. 
 
-The example [echo function](echo-function) and [echo application](echo) provide examples of how to handle events in the [Cloud Event](https://openevents.io) format leveraged by the Event Gateway.
+The [echo function](echo-function) and [echo application](echo) provide examples of how to handle HTTP events in the [Cloud Event](https://openevents.io) format leveraged by the Event Gateway.
 
 ## Tutorial
 
@@ -15,7 +15,7 @@ This tutorial assumes you have access to the [Google Cloud Platform](https://clo
 
 ## Creating a Kubernetes Cluster
 
-The remainder of this tutorial assumes you have access to a valid Kubernetes 1.9.7+ cluster. If you are using the Google Cloud Platform you can create a Kubernetes cluster using the `gcloud` command: 
+The remainder of this tutorial requires access to a Kubernetes 1.9.7+ cluster. Google Cloud Platform users can create a Kubernetes cluster using the `gcloud` command: 
 
 ```
 gcloud container clusters create event-gateway \
@@ -28,7 +28,9 @@ gcloud container clusters create event-gateway \
 
 ## Bootstrapping an Event Gateway Cluster
 
-In this section you will bootstrap a two node Event Gateway cluster backed by a single node etcd cluster. This deployment is only suitable for learning and demonstration purposes. This configuration is not recommend for production.
+In this section you will bootstrap a two node Event Gateway cluster suitable for learning and demonstration purposes.
+
+> The Event Gateway configuration used in this tutorial is not recommended for production as it lacks any form of security or authentication  
 
 ### Create an etcd Cluster
 
