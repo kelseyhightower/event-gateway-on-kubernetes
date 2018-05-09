@@ -30,7 +30,7 @@ gcloud container clusters create event-gateway \
 
 In this section you will bootstrap a two node Event Gateway cluster suitable for learning and demonstration purposes.
 
-> The Event Gateway configuration used in this tutorial is not recommended for production as it lacks any form of security or authentication  
+> The Event Gateway configuration used in this tutorial is not recommended for production as it lacks any form of security or authentication.     
 
 ### Create an etcd Cluster
 
@@ -68,7 +68,7 @@ deployment "event-gateway" created
 service "event-gateway" created
 ```
 
-At this point the Event Gateway should be up and running and exposed via an external loadbalancer.
+At this point the Event Gateway should be deployed and exposed via an external load balancer accessible to external clients. Verify the Event Gateway is up and running:
 
 ```
 kubectl get pods
@@ -90,9 +90,7 @@ NAME                  TYPE           CLUSTER-IP      EXTERNAL-IP     PORT(S)    
 event-gateway         LoadBalancer   10.15.248.210   XX.XXX.XXX.XX   4000:31061/TCP,4001:32247/TCP   11m
 ```
 
-> In this tutorial the Event Gateway is not protected by TLS or authentication and should only be used for learning the basics.
-
-Get the external IP address assigned to the `event-gateway` service and store it:
+Extract the `event-gateway` service external IP address and store it:
 
 ```
 EVENT_GATEWAY_IP=$(kubectl get svc \
