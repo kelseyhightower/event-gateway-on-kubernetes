@@ -306,6 +306,10 @@ kubectl logs echo-77d48cb484-2h5cl
 ## Clean Up
 
 ```
+gcloud beta functions delete echo --quiet
+```
+
+```
 kubectl delete -f deployments
 ```
 
