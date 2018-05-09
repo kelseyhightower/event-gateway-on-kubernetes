@@ -115,11 +115,13 @@ export FUNCTION_URL=$(gcloud beta functions describe echo \
   --format 'value(httpsTrigger.url)')
 ```
 
+The `FUNCTION_URL` environment variable will be used in the next section to register the `echo` cloud function with the Event Gateway.
+
 ### Register the echo Goole Cloud Function
 
 In this section you will register the `echo` cloud function with the Event Gateway.
 
-Create a function registration request body:
+Create a function registration request object:
 
 ```
 cat > register-function.json <<EOF
@@ -133,7 +135,7 @@ cat > register-function.json <<EOF
 EOF
 ```
 
-Register the `echo` cloud function by posting the function registration to the Event Gateway:
+Register the `echo` cloud function by posting the function registration object to the Event Gateway:
 
 ```
 curl --request POST \
@@ -146,7 +148,7 @@ At this point the `echo` cloud function has been registered with the Event Gatew
 
 ### Create a Subscription
 
-A subscription binds an event to a function. Create an HTTP event subscription which binds the `echo` cloud function to a HTTP event:
+A [subscription](https://github.com/serverless/event-gateway#subscriptions) binds an event to a function. In this section you will create an HTTP event subscription that binds the `echo` cloud function to HTTP events recieved on `POST` method and `/` path pair:
 
 ```
 curl --request POST \
@@ -160,9 +162,9 @@ curl --request POST \
   }'
 ```
 
-### Emit an HTTP Event
+### Test the echo cloud function
 
-With the `echo` cloud function registered and bound to an HTTP event on the `/` HTTP request path we are ready to test our setup.
+With the `echo` cloud function registered and subscribed to HTTP events we can test the configuration my emitting an HTTP event.
 
 Submit an HTTP request to the Event Gateway:
 
