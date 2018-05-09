@@ -256,7 +256,7 @@ curl -X DELETE \
   http://${EVENT_GATEWAY_IP}:4001/v1/spaces/default/subscriptions/http,POST,%2F
 ```
 
-> An alternative would be to create a new subscription on a different HTTP path or method.
+> Another option would be to create a new subscription on a different HTTP path or method that does not conflict with the current subscription.
 
 Next, create an HTTP event subscription for the `echo-service` function:
 
