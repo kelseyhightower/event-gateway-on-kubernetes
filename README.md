@@ -91,7 +91,7 @@ NAME                  TYPE           CLUSTER-IP      EXTERNAL-IP     PORT(S)    
 event-gateway         LoadBalancer   10.15.248.210   XX.XXX.XXX.XX   4000:31061/TCP,4001:32247/TCP   11m
 ```
 
-Extract the `event-gateway` service external IP address and store it:
+Extract the `event-gateway` external IP address and store it:
 
 ```
 EVENT_GATEWAY_IP=$(kubectl get svc \
@@ -122,7 +122,7 @@ The `FUNCTION_URL` environment variable will be used in the next section to regi
 
 In this section you will register the `echo` cloud function with the Event Gateway.
 
-Create a function registration request object:
+Create a function registration object:
 
 ```
 cat > register-function.json <<EOF
@@ -149,7 +149,7 @@ At this point the `echo` cloud function has been registered with the Event Gatew
 
 ### Create a Subscription
 
-A [subscription](https://github.com/serverless/event-gateway#subscriptions) binds an event to a function. In this section you will create an HTTP event subscription that binds the `echo` cloud function to HTTP events recieved on `POST` method and `/` path pair:
+A [subscription](https://github.com/serverless/event-gateway#subscriptions) binds an event to a function. In this section you will create an HTTP event subscription that binds the `echo` cloud function to HTTP events recieved on the `POST` method and the `/` path pair:
 
 ```
 curl --request POST \
@@ -165,7 +165,7 @@ curl --request POST \
 
 ### Test the echo cloud function
 
-With the `echo` cloud function registered and subscribed to HTTP events we can test the configuration by emitting HTTP events to the Event Gateway.
+With the `echo` cloud function registered and subscribed to HTTP events you can test the configuration by emitting HTTP events to the Event Gateway.
 
 Submit an HTTP event to the Event Gateway:
 
