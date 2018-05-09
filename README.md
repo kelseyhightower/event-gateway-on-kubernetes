@@ -2,7 +2,7 @@
 
 This guide walks you through provisioning a multi-node [Event Gateway](https://github.com/serverless/event-gateway) cluster on Kubernetes. This guide also demostrates how events can be routed across a diverse set of computing environments including Function as a Service (FaaS) offerings and containers running on Kubernetes. 
 
-The example [echo](echo-function) function and [echo](echo) application provide examples of how to handle events in the [Cloud Event](https://openevents.io) format leveraged by the Event Gateway.
+The example [echo function](echo-function) and [echo application](echo) provide examples of how to handle events in the [Cloud Event](https://openevents.io) format leveraged by the Event Gateway.
 
 ## Tutorial
 
