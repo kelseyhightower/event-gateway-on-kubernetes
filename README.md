@@ -232,7 +232,7 @@ event-gateway-5ff8554766-r7ndx   1/1       Running   0          1m
 event-gateway-5ff8554766-tp87g   1/1       Running   0          1m
 ```
 
-Register the `echo` service with the Event Gateway:
+Register the `echo` service using an unique function ID:
 
 ```
 curl --request POST \
