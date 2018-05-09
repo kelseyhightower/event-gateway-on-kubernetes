@@ -100,7 +100,7 @@ EVENT_GATEWAY_IP=$(kubectl get svc \
 
 ## Routing Events to Google Cloud Functions
 
-In this section you will deploy a Google Cloud Function which will be used to test the event routing functionality of the Event Gateway cluster. Deploy the `echo` cloud function:
+In this section you will deploy the `echo` Google Cloud Function used to test the event routing functionality of the Event Gateway. Deploy the `echo` cloud function:
 
 ```
 gcloud beta functions deploy echo \
