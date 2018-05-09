@@ -188,7 +188,7 @@ Content-Type: text/plain; charset=utf-8
 
 > Notice the value of the `Compute-Type` HTTP header. It was set to `function` by the `echo` cloud function.
 
-Review the echo cloud functions logs:
+Review the `echo` cloud function logs:
 
 ```
 gcloud beta functions logs read echo
@@ -203,11 +203,11 @@ D      echo  4uczimni6d70  2018-05-08 23:24:11.546  Function execution took 341 
 
 ## Routing Events to Kubernetes Services
 
-In most Serverless deployments events are typically routed to functions running on a hosted FaaS platform such as [Google Cloud Functions](https://cloud.google.com/functions) or [AWS Lambda](https://aws.amazon.com/lambda). However this is not a hard requirement. Using the Event Gateway events can be routed to any HTTP endpoint.
+In most Serverless deployments events are typically routed to functions running on a hosted FaaS platform such as [Google Cloud Functions](https://cloud.google.com/functions) or [AWS Lambda](https://aws.amazon.com/lambda). However this is not a hard requirement. Using the Event Gateway events can be routed to any HTTP endpoint, including endpoints backed by containers running on Kubernetes.
 
 In this section you will deploy the `gcr.io/hightowerlabs/echo:event-gateway` container using Kubernetes and route HTTP events to it using the Event Gateway.
 
-Create a `echo` Kubernetes deployment and service:
+Create the `echo` deployment and service:
 
 ```
 kubectl create -f deployments/echo.yaml
@@ -218,7 +218,20 @@ deployment "echo" created
 service "echo" created
 ```
 
-Register the Kubernetes `echo` service with the Event Gateway:
+Verify the `echo` deployment is up and running:
+
+```
+kubectl get pods
+```
+```
+NAME                             READY     STATUS    RESTARTS   AGE
+echo-77d48cb484-2h5cl            1/1       Running   0          30s
+etcd-0                           1/1       Running   0          2m
+event-gateway-5ff8554766-r7ndx   1/1       Running   0          1m
+event-gateway-5ff8554766-tp87g   1/1       Running   0          1m
+```
+
+Register the `echo` service with the Event Gateway:
 
 ```
 curl --request POST \
@@ -233,7 +246,9 @@ curl --request POST \
   }'
 ```
 
-> At this point the `echo` service has been registered with the Event Gateway, but before it can receive events a subscription must be created.
+> The HTTP URL follows the standard format for accessing cluster local services. In this case the `echo` deployment runs in the `default` namespace. This configuration works because the Event Gateway is running in the same cluster as the `echo` deployment.
+
+At this point the `echo` service has been registered with the Event Gateway, but before it can receive events a subscription must be created.
 
 There can only be one binding for a specific HTTP event mapped to a specific path and method. Before we can route events to the `echo` Kubernetes service we need to delete the subscription for the `echo` cloud function:
 
@@ -279,7 +294,7 @@ Content-Type: text/plain; charset=utf-8
 Review the `echo` container logs:
 
 ```
-kubectl logs echo-77d48cb484-5tqdq
+kubectl logs echo-77d48cb484-2h5cl
 ```
 
 ```
