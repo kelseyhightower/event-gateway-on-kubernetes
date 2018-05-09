@@ -188,7 +188,7 @@ Content-Type: text/plain; charset=utf-8
 
 > Notice the value of the `Compute-Type` HTTP header. It was set to `function` by the `echo` cloud function.
 
-Review the Cloud Functions logs:
+Review the echo cloud functions logs:
 
 ```
 gcloud beta functions logs read echo
