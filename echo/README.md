@@ -1,6 +1,6 @@
 # echo
 
-The `echo` service handles [HTTP Events](https://github.com/serverless/event-gateway/blob/master/docs/api.md#http-event) based on the [CloudEvent](https://github.com/serverless/event-gateway/blob/master/docs/api.md#event-definition) event format and echos the request body back to the caller.
+The `echo` service handles [HTTP Events](https://github.com/serverless/event-gateway/blob/master/docs/api.md#http-event) based on the [CloudEvent](https://github.com/serverless/event-gateway/blob/master/docs/api.md#event-definition) event format and echoes the request body back to the caller.
 
 ## Usage
 
