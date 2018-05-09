@@ -204,7 +204,7 @@ D      echo  4uczimni6d70  2018-05-08 23:24:11.546  Function execution took 341 
 
 ## Routing Events to Kubernetes Services
 
-In modern Serverless architectures events are typically routed to functions running on fully managed FaaS platforms such as [Google Cloud Functions](https://cloud.google.com/functions) or [AWS Lambda](https://aws.amazon.com/lambda). In some situations, such as low latency requirements, it maybe preferable to route events to existing application running on traditional infrastructure.
+In modern Serverless architectures events are typically routed to functions running on fully managed FaaS platforms such as [Google Cloud Functions](https://cloud.google.com/functions) or [AWS Lambda](https://aws.amazon.com/lambda). In some situations, such as low latency requirements, it maybe preferable to route events to existing applications running on traditional infrastructure.
 
 In this section you will deploy the `echo` application using Kubernetes and configure the Event Gateway to route HTTP events to it.
 
