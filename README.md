@@ -4,9 +4,19 @@ This guide walks you through provisioning a multi-node [Event Gateway](https://g
 
 The [echo function](echo-function) and [echo application](echo) will serve as event handlers and provide working examples of how to process events in the [Cloud Event](https://openevents.io) format leveraged by the Event Gateway.
 
-## Tutorial
+## Prerequisites 
 
-This tutorial assumes you have access to the [Google Cloud Platform](https://cloud.google.com) and have enabled the [Cloud Functions](https://cloud.google.com/functions) and [Kubernetes Engine](https://cloud.google.com/kubernetes-engine) APIs.
+This tutorial assumes you have access to the [Google Cloud Platform](https://cloud.google.com) with the Cloud Functions and Kubernetes Engine APIs enabled.
+
+```
+gcloud services enable \
+  cloudapis.googleapis.com \
+  cloudfunctions.googleapis.com \
+  container.googleapis.com \
+  containerregistry.googleapis.com
+```
+
+## Tutorial
 
 * [Creating a Kubernetes Cluster](#creating-a-kubernetes-cluster)
 * [Bootstrapping an Event Gateway Cluster](#bootstrapping-an-event-gateway-cluster)
