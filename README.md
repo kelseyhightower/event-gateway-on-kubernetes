@@ -303,7 +303,7 @@ kubectl logs echo-77d48cb484-2h5cl
 2018/05/08 23:35:35 Handling HTTP event f3a37c57-d85a-4942-b92c-cef56713d538 ...
 ```
 
-## Clean
+## Clean Up
 
 ```
 kubectl delete -f deployments
