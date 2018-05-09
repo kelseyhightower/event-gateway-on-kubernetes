@@ -166,7 +166,7 @@ curl --request POST \
 
 With the `echo` cloud function registered and subscribed to HTTP events we can test the configuration my emitting HTTP events to the Event Gateway.
 
-Submit an HTTP request to the Event Gateway:
+Submit an HTTP event to the Event Gateway:
 
 ```
 curl -i --request POST \
@@ -174,7 +174,7 @@ curl -i --request POST \
   --data '{"message": "Hello world!"}'
 ```
 
-The `echo` cloud function will respond with the data submitted in the HTTP request:
+The `echo` cloud function will respond with the data submitted in the HTTP event:
 
 ```
 HTTP/1.1 200 OK
@@ -186,7 +186,7 @@ Content-Type: text/plain; charset=utf-8
 {"message": "Hello world!"}
 ```
 
-> Notice the value of the `Compute-Type` HTTP header. It was set to `function` by the echo cloud function.
+> Notice the value of the `Compute-Type` HTTP header. It was set to `function` by the `echo` cloud function.
 
 Review the Cloud Functions logs:
 
