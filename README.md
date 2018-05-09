@@ -12,6 +12,7 @@ This tutorial assumes you have access to the [Google Cloud Platform](https://clo
 * [Bootstrapping an Event Gateway Cluster](#bootstrapping-an-event-gateway-cluster)
 * [Routing Events to Google Cloud Functions](#routing-events-to-google-cloud-functions)
 * [Routing Events to Kubernetes Services](#routing-events-to-kubernetes-services)
+* [Clean Up](#clean-up)
 
 ## Creating a Kubernetes Cluster
 
@@ -300,4 +301,18 @@ kubectl logs echo-77d48cb484-2h5cl
 ```
 2018/05/08 23:30:04 Starting HTTP server...
 2018/05/08 23:35:35 Handling HTTP event f3a37c57-d85a-4942-b92c-cef56713d538 ...
+```
+
+## Clean
+
+```
+kubectl delete -f deployments
+```
+
+```
+kubectl delete -f statefulsets
+```
+
+```
+gcloud container clusters delete event-gateway --quiet
 ```
