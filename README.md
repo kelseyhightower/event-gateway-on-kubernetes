@@ -164,7 +164,7 @@ curl --request POST \
 
 ### Test the echo cloud function
 
-With the `echo` cloud function registered and subscribed to HTTP events we can test the configuration my emitting an HTTP event.
+With the `echo` cloud function registered and subscribed to HTTP events we can test the configuration my emitting HTTP events to the Event Gateway.
 
 Submit an HTTP request to the Event Gateway:
 
