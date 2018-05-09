@@ -247,7 +247,7 @@ curl --request POST \
   }'
 ```
 
-> The HTTP URL follows the standard format for accessing cluster local services. In this case the `echo` deployment runs in the `default` namespace. This configuration works because the Event Gateway is running in the same cluster as the `echo` deployment.
+> The provider URL follows the standard format for accessing cluster local services. In this case the `echo` deployment runs in the `default` namespace. This configuration works because the Event Gateway is running in the same cluster as the `echo` deployment.
 
 At this point the `echo` service has been registered with the Event Gateway, but before it can receive events a subscription must be created. There can only be one binding for HTTP events mapped to a specific path and method pair.
 
