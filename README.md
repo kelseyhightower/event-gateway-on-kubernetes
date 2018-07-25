@@ -128,7 +128,7 @@ export FUNCTION_URL=$(gcloud beta functions describe echo \
 
 The `FUNCTION_URL` environment variable will be used in the next section to register the `echo` cloud function with the Event Gateway.
 
-### Register the echo Goole Cloud Function
+### Register the echo Google Cloud Function
 
 In this section you will register the `echo` cloud function with the Event Gateway.
 
